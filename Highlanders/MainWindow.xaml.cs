@@ -24,5 +24,8 @@ namespace Highlanders
         {
             InitializeComponent();
         }
+
+        int highlanderCount = 0;
+        // List<Highlander> highlanders = new List<Highlander>();
     }
 }
