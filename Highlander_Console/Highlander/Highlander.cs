@@ -39,6 +39,7 @@ namespace Highlander_Console.lander
             }
             else
             {
+                //TODO: Implement logic for invalid move
                 Console.WriteLine($"Highlander {Id} could not move to position ({newRow}, {newCol})");
             }
         }

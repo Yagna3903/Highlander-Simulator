@@ -19,6 +19,7 @@ namespace Highlander_Console
             InitializeBoard();
         }
 
+        
         public void InitializeBoard()
         {
             for (int i = 0; i < Rows; i++)
@@ -57,5 +58,20 @@ namespace Highlander_Console
         {
             return row >= 0 && row < Rows && col >= 0 && col < Columns;
         }
+
+        //TODO: Implement method to place highlanders on the board
+        // 0 - empty cell
+        // 1 - good highlander
+        // 2 - bad highlander
+        public void PlaceHighlander(int row, int col, int highlanderType)
+        {
+            if (IsPositionValid(row, col))
+            {
+                Board[row, col] = highlanderType;
+            }
+        }
+
+        //TODO: Implement method to remove dead highlanders from the board
+
     }
 }
