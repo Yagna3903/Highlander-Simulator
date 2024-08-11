@@ -14,7 +14,34 @@ namespace Highlander_Console.lander
         public (int, int) Position { get; set; }
         public bool IsAlive { get; set; }
 
-        public abstract void Move(IGameBoard gameBoard);
+        public void Move(IGameBoard gameBoard) {
+            // Possible moves (8 directions)
+            var directions = new (int RowOffset, int ColOffset)[]
+            {
+            (-1, -1), (-1, 0), (-1, 1),
+            (0, -1),          (0, 1),
+            (1, -1), (1, 0), (1, 1)
+            };
+
+            // Randomly select a direction
+            Random random = new Random();
+            var direction = directions[random.Next(directions.Length)];
+
+            // Calculate new position
+            var newRow = Position.Item1 + direction.RowOffset;
+            var newCol = Position.Item2 + direction.ColOffset;
+
+            // Check if the new position is valid
+            if (gameBoard.IsPositionValid(newRow, newCol))
+            {
+                Position = (newRow, newCol);
+                Console.WriteLine($"Highlander {Id} moved to position ({newRow}, {newCol})");
+            }
+            else
+            {
+                Console.WriteLine($"Highlander {Id} could not move to position ({newRow}, {newCol})");
+            }
+        }
         public abstract void Interact(Highlander highlander);
     }
 
@@ -37,11 +64,6 @@ namespace Highlander_Console.lander
             }
         }
 
-        public override void Move(IGameBoard gameBoard)
-        {
-            // TODO : Implement  method to move highlander on the game board
-            
-        }
     }
 
     public class BadHighlander : Highlander
@@ -61,10 +83,5 @@ namespace Highlander_Console.lander
             
         }
 
-        public override void Move(IGameBoard gameBoard)
-        {
-            // TODO : Implement this method
-            
-        }
     }
 }

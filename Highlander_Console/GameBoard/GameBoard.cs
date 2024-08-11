@@ -16,7 +16,7 @@ namespace Highlander_Console
             Rows = rows;
             Columns = columns;
             Board = new int[Rows, Columns];
-            
+            InitializeBoard();
         }
 
         public void InitializeBoard()
@@ -53,5 +53,9 @@ namespace Highlander_Console
             }
         }
 
+        public bool IsPositionValid(int row, int col)
+        {
+            return row >= 0 && row < Rows && col >= 0 && col < Columns;
+        }
     }
 }

@@ -17,5 +17,7 @@ namespace Highlander_Console
         void PrintBoard();
 
         void resetBoard();
+
+        bool IsPositionValid(int row, int col);
     }
 }
