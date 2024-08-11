@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{643F1821-3858-491D-989D-E18149FB3804}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>Highlander_Console</RootNamespace>
-    <AssemblyName>Highlander_Console</AssemblyName>
+    <ProjectGuid>{0DF09758-6597-4441-8ACB-B12D1DA515CA}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Highlander_ConsoleApp</RootNamespace>
+    <AssemblyName>Highlander_ConsoleApp</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -32,10 +32,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Highlander_Components">
+      <HintPath>..\Highlander_Console\bin\Debug\Highlander_Components.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -46,16 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameBoard\GameBoard.cs" />
-    <Compile Include="GameBoard\IGameBoard.cs" />
-    <Compile Include="GameStimulation\GameStimulation.cs" />
-    <Compile Include="Highlander\Highlander.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

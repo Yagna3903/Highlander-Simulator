@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Highlander_Console
 {
-    internal class GameBoard : IGameBoard
+    public class GameBoard : IGameBoard
     {
         public int Rows { get; set; }
         public int Columns { get; set; }
