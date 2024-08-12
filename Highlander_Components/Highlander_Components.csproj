@@ -48,9 +48,9 @@
   <ItemGroup>
     <Compile Include="GameBoard\GameBoard.cs" />
     <Compile Include="GameBoard\IGameBoard.cs" />
+    <Compile Include="GameStimulation\GameStart.cs" />
     <Compile Include="GameStimulation\GameStimulation.cs" />
     <Compile Include="Highlander\Highlander.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

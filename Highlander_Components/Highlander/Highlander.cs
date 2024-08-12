@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Highlander_Component.GameBoard;
+using System;
 
-namespace Highlander_Console.lander
+namespace Highlander_Components.lander
 {
     public abstract class Highlander
     {
@@ -16,6 +13,7 @@ namespace Highlander_Console.lander
 
         Random random = new Random();
 
+        // Move the highlander to a new position
         public void Move(IGameBoard gameBoard)
         {
             bool moved = false;
@@ -44,11 +42,16 @@ namespace Highlander_Console.lander
                 if (gameBoard.IsPositionValid(newRow, newCol))
                 {
                     Position = (newRow, newCol);
-                    Console.WriteLine($"Highlander {Id} moved to position ({newRow}, {newCol})");
+                    PrintPosition();
                     moved = true;
                 }
             }
 
+        }
+        
+        public void PrintPosition()
+        {
+            Console.WriteLine($"Highlander {Id} is at position {Position}");
         }
         public abstract void Interact(Highlander highlander);
     }

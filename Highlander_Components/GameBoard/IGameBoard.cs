@@ -1,11 +1,7 @@
-﻿using Highlander_Console.lander;
-using System;
+﻿using Highlander_Components.lander;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Highlander_Console
+namespace Highlander_Component.GameBoard
 {
     public interface IGameBoard
     {
@@ -17,10 +13,10 @@ namespace Highlander_Console
 
         void PrintBoard();
 
-        void resetBoard();
-
         bool IsPositionValid(int row, int col);
 
-        void AddHighlander(Highlander highlander);
+        void ClearBoard();
+
+        void UpdateBoard(List<Highlander> highlanders);
     }
 }

@@ -1,37 +1,42 @@
-﻿using Highlander_Console.lander;
+﻿using Highlander_Component.GameBoard;
+using Highlander_Components.lander;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Highlander_Console.GameLogic
+namespace Highlander_Components.GameStimulation
 {
     public class GameStimulation
     {
+        // Declare the game board and highlanders
         private IGameBoard gameBoard;
         private List<Highlander> highlanders;
+
 
         public GameStimulation(IGameBoard gameBoard, List<Highlander> highlanders)
         {
             this.gameBoard = gameBoard;
             this.highlanders = highlanders;
+            GameStart.PlaceHighlanders(this.gameBoard, this.highlanders);
         }
+
 
         public void RunSimulation(int maxIterations)
         {
-            for (int iteration = 0; iteration < maxIterations; iteration++)
+            for (int i = 0; i < maxIterations; i++)
             {
-                Console.WriteLine($"Iteration {iteration + 1}:");
+                Console.WriteLine($"Iteration {i + 1}:");
+                Console.WriteLine("Highlanders' positions:");
+
                 foreach (var highlander in highlanders)
                 {
+                    highlander.PrintPosition();
                     highlander.Move(gameBoard);
                     HandleInteractions(highlander);
                 }
-
+                gameBoard.UpdateBoard(highlanders);
                 gameBoard.PrintBoard();
 
-                // Check for end conditions
+                // If only 
                 if (highlanders.Count <= 1)
                 {
                     break;
