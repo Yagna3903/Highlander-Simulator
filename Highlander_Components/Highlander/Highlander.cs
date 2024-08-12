@@ -14,35 +14,41 @@ namespace Highlander_Console.lander
         public (int, int) Position { get; set; }
         public bool IsAlive { get; set; }
 
-        public void Move(IGameBoard gameBoard) {
+        Random random = new Random();
+
+        public void Move(IGameBoard gameBoard)
+        {
+            bool moved = false;
+
             // Possible moves (8 directions)
             var directions = new (int RowOffset, int ColOffset)[]
             {
-            (-1, -1), (-1, 0), (-1, 1),
-            (0, -1),          (0, 1),
-            (1, -1), (1, 0), (1, 1)
+                (-1, -1), (-1, 0), (-1, 1),
+                (0, -1),          (0, 1),
+                (1, -1), (1, 0), (1, 1)
             };
 
-            // Randomly select a direction
-            Random random = new Random();
-            var direction = directions[random.Next(directions.Length)];
-
-            // Calculate new position
-            var newRow = Position.Item1 + direction.RowOffset;
-            var newCol = Position.Item2 + direction.ColOffset;
-
-            // Check if the new position is valid
-            
-            if (gameBoard.IsPositionValid(newRow, newCol))
+            // Keep trying to move until a valid move is made
+            while (!moved)
             {
-                Position = (newRow, newCol);
-                Console.WriteLine($"Highlander {Id} moved to position ({newRow}, {newCol})");
+
+                // Randomly select a direction from the possible directions
+                var direction = directions[random.Next(directions.Length)];
+
+                // Calculate new position
+                var newRow = Position.Item1 + direction.RowOffset;
+                var newCol = Position.Item2 + direction.ColOffset;
+
+                // Check if the new position is valid
+
+                if (gameBoard.IsPositionValid(newRow, newCol))
+                {
+                    Position = (newRow, newCol);
+                    Console.WriteLine($"Highlander {Id} moved to position ({newRow}, {newCol})");
+                    moved = true;
+                }
             }
-            else
-            {
-                //TODO: Implement logic for invalid move
-                Console.WriteLine($"Highlander {Id} could not move to position ({newRow}, {newCol})");
-            }
+
         }
         public abstract void Interact(Highlander highlander);
     }
@@ -82,7 +88,7 @@ namespace Highlander_Console.lander
         public override void Interact(Highlander highlander)
         {
             // TODO : Implement this method
-            
+
         }
 
     }

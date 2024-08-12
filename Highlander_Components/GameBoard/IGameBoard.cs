@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Highlander_Console.lander;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,5 +20,7 @@ namespace Highlander_Console
         void resetBoard();
 
         bool IsPositionValid(int row, int col);
+
+        void AddHighlander(Highlander highlander);
     }
 }
