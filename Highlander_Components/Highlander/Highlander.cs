@@ -32,6 +32,7 @@ namespace Highlander_Console.lander
             var newCol = Position.Item2 + direction.ColOffset;
 
             // Check if the new position is valid
+            
             if (gameBoard.IsPositionValid(newRow, newCol))
             {
                 Position = (newRow, newCol);

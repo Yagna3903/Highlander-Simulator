@@ -33,8 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Highlander_Components">
-      <HintPath>..\Highlander_Console\bin\Debug\Highlander_Components.dll</HintPath>
+    <Reference Include="Highlander_Components, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Highlander_Components\bin\Debug\Highlander_Components.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
