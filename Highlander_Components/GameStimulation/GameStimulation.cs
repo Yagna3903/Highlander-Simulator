@@ -11,6 +11,7 @@ namespace Highlander_Components.GameStimulation
         // Declare the game board and highlanders
         private IGameBoard<Highlander> gameBoard;
         private List<Highlander> highlanders;
+        int totalIteration = 0;
 
 
         public GameStimulation(IGameBoard<Highlander> gameBoard, List<Highlander> highlanders)
@@ -30,6 +31,16 @@ namespace Highlander_Components.GameStimulation
             {
                 Console.WriteLine($"Iteration {i + 1}:");
                 Console.WriteLine("Highlanders' positions:");
+
+                // every 365 iterations, highlanders age by 1 year
+                if (i % 365 == 0)
+                {
+                    foreach (var highlander in highlanders)
+                    {
+                        if (highlander.IsAlive) { highlander.age(); }
+
+                    }
+                }
 
                 // Print all highlanders' positions
                 foreach (var highlander in highlanders)
@@ -51,14 +62,33 @@ namespace Highlander_Components.GameStimulation
                         // Get new position
                         var (newRow, newCol) = highlander.GetPosition();
 
-                        // Update board with the highlander
-                        if (currentRow != newRow || currentCol != newCol)
-                        {
-                            // Remove Highlander from old position
-                            gameBoard.RemoveItem(highlander, currentRow, currentCol);
+                        // Remove Highlander from old position
+                        gameBoard.RemoveItem(highlander, currentRow, currentCol);
 
-                            // Add Highlander to new position
-                            gameBoard.AddItem(highlander, newRow, newCol);
+                        // Add Highlander to new position
+                        gameBoard.AddItem(highlander, newRow, newCol);
+
+                    }
+                }
+
+                // loop through the game board and handle interaction between highlanders
+
+                for (int row = 0; row < gameBoard.Rows; row++)
+                {
+                    for (int col = 0; col < gameBoard.Columns; col++)
+                    {
+                        if (gameBoard.Board[row, col].Count > 1)
+                        {
+                            // all highlanders at current position
+                            List<Highlander> highlanders = gameBoard.Board[row, col];
+
+                            for (int j = 0; j < highlanders.Count - 1; j++)
+                            {
+                                for (int k = j + 1; k < highlanders.Count; k++)
+                                {
+                                    highlanders[j].Fight(highlanders[k]);
+                                }
+                            }
                         }
                     }
                 }
@@ -71,11 +101,13 @@ namespace Highlander_Components.GameStimulation
                 {
                     break;
                 }
+
+                totalIteration++;
             }
             DisplayResults();
         }
 
-            private void HandleInteractions(Highlander highlander)
+        private void HandleInteractions(Highlander highlander)
         {
             foreach (var h in highlanders)
             {

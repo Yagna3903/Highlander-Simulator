@@ -24,7 +24,7 @@ namespace Highlander_ConsoleApp
                 GameStimulation gamePlay = new GameStimulation(gameBoard, highlanders);
 
                 // Run the simulation
-                gamePlay.RunSimulation(5);
+                gamePlay.RunSimulation(50);
 
                 Console.ReadLine();
             }

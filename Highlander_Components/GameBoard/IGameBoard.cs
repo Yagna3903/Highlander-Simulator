@@ -28,8 +28,5 @@ namespace Highlander_Component.GameBoard
         // Remove an item from the game board
         void RemoveItem(T item, int row, int col);
 
-        // Update the game board
-        void UpdateBoard(List<T> items, Func<T, (int, int)> getPosition, Func<T, bool> isAlive);
-
     }
 }

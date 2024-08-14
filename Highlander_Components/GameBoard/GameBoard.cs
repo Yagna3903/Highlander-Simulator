@@ -31,26 +31,6 @@ namespace Highlander_Component.GameBoard
             }
         }
 
-        public void PrintBoard()
-        {
-            for (int i = 0; i < Rows; i++)
-            {
-                for (int j = 0; j < Columns; j++)
-                {
-                    // Print the list of highlanders at each position
-                    Console.Write("[");
-                    foreach (var item in Board[i,j])
-                    {
-                        int type = item is GoodHighlander ? 1 : 2;
-                        Console.Write(type + " ");
-                    }
-                    Console.Write("] ");
-                }
-                // Move to the next row
-                Console.WriteLine();
-            }
-        }
-
         public bool IsPositionValid(int row, int col)
         {
             return row >= 0 && row < Rows && col >= 0 && col < Columns;
@@ -77,21 +57,27 @@ namespace Highlander_Component.GameBoard
             Board[row, col].Remove(item);
         }
 
-
-        // TODO : Refactor and remove this method use add and remove instead
-        public void UpdateBoard(List<T> items, Func<T, (int,int)> getPosition, Func<T, bool> isAlive)
+        // Print the game board
+        public void PrintBoard()
         {
-            ClearBoard(); // Clear current state
-
-            foreach (var item in items)
+            for (int i = 0; i < Rows; i++)
             {
-                var (row, col) = getPosition(item);
-                if (IsPositionValid(row, col) && isAlive(item))
+                for (int j = 0; j < Columns; j++)
                 {
-                    Board[row, col].Add(item);
+                    // Print the list of highlanders at each position
+                    Console.Write("[");
+                    foreach (var item in Board[i, j])
+                    {
+                        int type = item is GoodHighlander ? 1 : 2;
+                        Console.Write(type + " ");
+                    }
+                    Console.Write("] ");
                 }
-               
+                // Move to the next row
+                Console.WriteLine();
             }
         }
+
+
     }
 }

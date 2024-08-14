@@ -11,7 +11,7 @@ namespace Highlander_Components.lander
         public (int, int) Position { get; set; }
         public bool IsAlive { get; set; }
 
-        Random random = new Random();
+        protected Random random = new Random();
 
         // Move the highlander to a new position
         public void Move(IGameBoard<Highlander> gameBoard)
@@ -54,9 +54,13 @@ namespace Highlander_Components.lander
             return Position;
         }
 
+        public void Fight(Highlander highlander)
+        {
+            Console.WriteLine($"Highlander {Id} is fighting Highlander {highlander.Id}");
+        }
 
 
-        public void PrintPosition()
+            public void PrintPosition()
         {
             Console.WriteLine($"Highlander {Id} is at position {Position}");
         }
@@ -100,8 +104,11 @@ namespace Highlander_Components.lander
             }
         }
 
+        private bool TryToEscape()
+        {
+            return random.Next(0, 2) == 1;
+        }
     }
-
     public class BadHighlander : Highlander
     {
         public BadHighlander(int Id, int power, int age, (int, int) position, bool IsAlive)
@@ -116,7 +123,6 @@ namespace Highlander_Components.lander
         public override void Interact(Highlander highlander)
         {
             // TODO : Implement this method
-
         }
 
     }
