@@ -54,6 +54,24 @@ namespace Highlander_Components.lander
             Console.WriteLine($"Highlander {Id} is at position {Position}");
         }
         public abstract void Interact(Highlander highlander);
+
+        // Highlander dies
+        public void Die()
+        {
+            IsAlive = false;
+        }
+
+        public void absorbPower(Highlander highlander)
+        {
+            Power += highlander.Power;
+        }
+
+        public void age()
+        {
+            Age++;
+        }
+
+
     }
 
     public class GoodHighlander : Highlander
