@@ -14,9 +14,9 @@ namespace Highlander_Components.lander
         Random random = new Random();
 
         // Move the highlander to a new position
-        public void Move(IGameBoard gameBoard)
+        public void Move(IGameBoard<Highlander> gameBoard)
         {
-            bool moved = false;
+            bool moved = false; // Flag to check if the highlander has moved
 
             // Possible moves (8 directions)
             var directions = new (int RowOffset, int ColOffset)[]
@@ -48,7 +48,14 @@ namespace Highlander_Components.lander
             }
 
         }
-        
+
+        public (int, int) GetPosition()
+        {
+            return Position;
+        }
+
+
+
         public void PrintPosition()
         {
             Console.WriteLine($"Highlander {Id} is at position {Position}");

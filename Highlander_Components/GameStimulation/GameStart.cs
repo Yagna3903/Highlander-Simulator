@@ -9,7 +9,7 @@ namespace Highlander_Components.GameStimulation
     {
         private static Random r = new Random();
 
-        public static void PlaceHighlanders(IGameBoard gameBoard, List<Highlander> highlanders)
+        public static void PlaceHighlanders(IGameBoard<Highlander> gameBoard, List<Highlander> highlanders)
         {
             foreach (var highlander in highlanders)
             {
@@ -22,18 +22,11 @@ namespace Highlander_Components.GameStimulation
 
                     if (gameBoard.IsPositionValid(row, col))
                     {
-                        // update highlander position
+                        // Update highlander position
                         highlander.Position = (row, col);
 
-                        // place highlander on the board
-                        if (highlander is GoodHighlander)
-                        {
-                            gameBoard.Board[row, col] = 1;
-                        }
-                        else if (highlander is BadHighlander)
-                        {
-                            gameBoard.Board[row, col] = 2;
-                        }
+                        // Place highlander on the board
+                        gameBoard.Board[row, col].Add(highlander);
                         placed = true;
                     }
                 }

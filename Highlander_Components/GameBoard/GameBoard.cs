@@ -4,16 +4,18 @@ using System.Collections.Generic;
 
 namespace Highlander_Component.GameBoard
 {
-    public class GameBoard : IGameBoard
+    public class GameBoard<T> : IGameBoard<T>
     {
         public int Rows { get; set; }
         public int Columns { get; set; }
-        public int[,] Board { get; set; } // game board size
+
+        public List<T>[,] Board { get; set; }
+
         public GameBoard(int rows, int columns)
         {
             Rows = rows;
             Columns = columns;
-            Board = new int[Rows, Columns];
+            Board = new List<T>[Rows, Columns];
             InitializeBoard();
         }
 
@@ -24,7 +26,7 @@ namespace Highlander_Component.GameBoard
             {
                 for (int j = 0; j < Columns; j++)
                 {
-                    Board[i, j] = 0;
+                    Board[i, j] = new List<T>();
                 }
             }
         }
@@ -35,8 +37,16 @@ namespace Highlander_Component.GameBoard
             {
                 for (int j = 0; j < Columns; j++)
                 {
-                    Console.Write(Board[i, j] + " ");
+                    // Print the list of highlanders at each position
+                    Console.Write("[");
+                    foreach (var item in Board[i,j])
+                    {
+                        int type = item is GoodHighlander ? 1 : 2;
+                        Console.Write(type + " ");
+                    }
+                    Console.Write("] ");
                 }
+                // Move to the next row
                 Console.WriteLine();
             }
         }
@@ -52,23 +62,35 @@ namespace Highlander_Component.GameBoard
             {
                 for (int j = 0; j < Columns; j++)
                 {
-                    Board[i, j] = 0;
+                    Board[i, j].Clear();
                 }
             }
         }
 
-        public void UpdateBoard(List<Highlander> highlanders)
+        public void AddItem(T item, int row, int col)
+        {
+            Board[row, col].Add(item);
+        }
+
+        public void RemoveItem(T item, int row, int col)
+        {
+            Board[row, col].Remove(item);
+        }
+
+
+        // TODO : Refactor and remove this method use add and remove instead
+        public void UpdateBoard(List<T> items, Func<T, (int,int)> getPosition, Func<T, bool> isAlive)
         {
             ClearBoard(); // Clear current state
 
-            foreach (var highlander in highlanders)
+            foreach (var item in items)
             {
-                int row = highlander.Position.Item1;
-                int col = highlander.Position.Item2;
-                if (highlander.IsAlive)
+                var (row, col) = getPosition(item);
+                if (IsPositionValid(row, col) && isAlive(item))
                 {
-                    Board[row, col] = highlander is GoodHighlander ? 1 : 2; // 1 for Good, 2 for Bad
+                    Board[row, col].Add(item);
                 }
+               
             }
         }
     }

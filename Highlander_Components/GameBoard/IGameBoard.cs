@@ -1,22 +1,35 @@
 ﻿using Highlander_Components.lander;
+using System;
 using System.Collections.Generic;
 
 namespace Highlander_Component.GameBoard
 {
-    public interface IGameBoard
+    public interface IGameBoard<T>
     {
-        int Rows { get; set; }
-        int Columns { get; set; }
-        int[,] Board { get; }
+        int Rows { get; } // Number of rows in the game board
+        int Columns { get; } // Number of columns in the game board
+        List<T>[,] Board { get;} // Game board with highlanders at different positions
 
-        void InitializeBoard();
+        // Initialize the game board
+        void InitializeBoard(); 
 
-        void PrintBoard();
+        // Print the game board
+        void PrintBoard(); 
 
-        bool IsPositionValid(int row, int col);
+        // Check if a position is valid
+        bool IsPositionValid(int row, int col); 
 
+        // Clear the game board
         void ClearBoard();
 
-        void UpdateBoard(List<Highlander> highlanders);
+        // Add an item to the game board
+        void AddItem(T item, int row, int col);
+
+        // Remove an item from the game board
+        void RemoveItem(T item, int row, int col);
+
+        // Update the game board
+        void UpdateBoard(List<T> items, Func<T, (int, int)> getPosition, Func<T, bool> isAlive);
+
     }
 }

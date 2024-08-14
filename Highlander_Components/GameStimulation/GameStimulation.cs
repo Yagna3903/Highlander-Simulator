@@ -2,17 +2,18 @@
 using Highlander_Components.lander;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Highlander_Components.GameStimulation
 {
     public class GameStimulation
     {
         // Declare the game board and highlanders
-        private IGameBoard gameBoard;
+        private IGameBoard<Highlander> gameBoard;
         private List<Highlander> highlanders;
 
 
-        public GameStimulation(IGameBoard gameBoard, List<Highlander> highlanders)
+        public GameStimulation(IGameBoard<Highlander> gameBoard, List<Highlander> highlanders)
         {
             this.gameBoard = gameBoard;
             this.highlanders = highlanders;
@@ -22,31 +23,59 @@ namespace Highlander_Components.GameStimulation
 
         public void RunSimulation(int maxIterations)
         {
+            Console.WriteLine("Game Board at the start:");
+            gameBoard.PrintBoard();
+
             for (int i = 0; i < maxIterations; i++)
             {
                 Console.WriteLine($"Iteration {i + 1}:");
                 Console.WriteLine("Highlanders' positions:");
 
+                // Print all highlanders' positions
                 foreach (var highlander in highlanders)
                 {
                     highlander.PrintPosition();
-                    highlander.Move(gameBoard);
-                    HandleInteractions(highlander);
                 }
-                gameBoard.UpdateBoard(highlanders);
+
+                // Move each highlander
+                foreach (var highlander in highlanders)
+                {
+                    if (highlander.IsAlive)
+                    {
+                        // Get current position
+                        var (currentRow, currentCol) = highlander.GetPosition();
+
+                        // Move highlander
+                        highlander.Move(gameBoard);
+
+                        // Get new position
+                        var (newRow, newCol) = highlander.GetPosition();
+
+                        // Update board with the highlander
+                        if (currentRow != newRow || currentCol != newCol)
+                        {
+                            // Remove Highlander from old position
+                            gameBoard.RemoveItem(highlander, currentRow, currentCol);
+
+                            // Add Highlander to new position
+                            gameBoard.AddItem(highlander, newRow, newCol);
+                        }
+                    }
+                }
+
+                // Print the updated board
                 gameBoard.PrintBoard();
 
-                // If only 
-                if (highlanders.Count <= 1)
+                // Check if only one highlander is left
+                if (highlanders.Count(h => h.IsAlive) <= 1)
                 {
                     break;
                 }
             }
-
             DisplayResults();
         }
 
-        private void HandleInteractions(Highlander highlander)
+            private void HandleInteractions(Highlander highlander)
         {
             foreach (var h in highlanders)
             {

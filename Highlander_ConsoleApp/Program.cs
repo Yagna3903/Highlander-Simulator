@@ -12,7 +12,7 @@ namespace Highlander_ConsoleApp
         {
             {
                 // Initialize the game board
-                IGameBoard gameBoard = new GameBoard(5, 5);
+                IGameBoard<Highlander> gameBoard = new GameBoard<Highlander>(5, 5);
 
                 // Create Highlanders
                 List<Highlander> highlanders = new List<Highlander>  {
