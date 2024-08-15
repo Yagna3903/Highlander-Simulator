@@ -35,7 +35,7 @@ namespace Highlander_Components.GameStimulation
                 // every 365 iterations, highlanders age by 1 year
                 if (i % 365 == 0)
                 {
-                    foreach (var highlander in highlanders)
+                    foreach (Highlander highlander in highlanders)
                     {
                         if (highlander.IsAlive) { highlander.age(); }
 
@@ -43,13 +43,16 @@ namespace Highlander_Components.GameStimulation
                 }
 
                 // Print all highlanders' positions
-                foreach (var highlander in highlanders)
+                foreach (Highlander highlander in highlanders)
                 {
-                    highlander.PrintPosition();
+                    if (highlander.IsAlive)
+                    {
+                        highlander.PrintPosition();
+                    }
                 }
 
                 // Move each highlander
-                foreach (var highlander in highlanders)
+                foreach (Highlander highlander in highlanders)
                 {
                     if (highlander.IsAlive)
                     {
@@ -93,6 +96,14 @@ namespace Highlander_Components.GameStimulation
                     }
                 }
 
+                foreach (Highlander highlander in highlanders)
+                {
+                    if (!highlander.IsAlive)
+                    {
+                        gameBoard.RemoveItem(highlander, highlander.Position.Item1, highlander.Position.Item2);
+                    }
+                }
+
                 // Print the updated board
                 gameBoard.PrintBoard();
 
@@ -109,7 +120,7 @@ namespace Highlander_Components.GameStimulation
 
         private void HandleInteractions(Highlander highlander)
         {
-            foreach (var h in highlanders)
+            foreach (Highlander h in highlanders)
             {
                 if (h != highlander && h.Position == highlander.Position)
                 {
@@ -121,10 +132,21 @@ namespace Highlander_Components.GameStimulation
 
         private void DisplayResults()
         {
-            Console.WriteLine("Simulation ended.");
-            if (highlanders.Count == 1)
+            int remainingHighlanders = 0;
+            List<Highlander> remainingH = new List<Highlander>();
+            foreach(Highlander h in highlanders)
             {
-                Console.WriteLine($"Winner: {highlanders[0].Id}");
+                if (h.IsAlive)
+                {
+                    remainingHighlanders++;
+                    remainingH.Add(h);
+                }
+            }
+
+            Console.WriteLine("Simulation ended.");
+            if (remainingHighlanders == 1)
+            {
+                Console.WriteLine($"Winner: {remainingH[0].Id}");
             }
             else
             {

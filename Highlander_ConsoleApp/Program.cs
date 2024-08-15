@@ -14,7 +14,7 @@ namespace Highlander_ConsoleApp
             //Declare variables
             int rows = 5;
             int columns = 5;
-            int maxIterations = 50;
+            int maxIterations = 100;
             int highlanderCount = 0;
             int totalCells = rows * columns;
             Random r = new Random();

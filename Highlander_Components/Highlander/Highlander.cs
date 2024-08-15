@@ -1,5 +1,6 @@
 ﻿using Highlander_Component.GameBoard;
 using System;
+using System.ComponentModel;
 
 namespace Highlander_Components.lander
 {
@@ -56,7 +57,31 @@ namespace Highlander_Components.lander
 
         public void Fight(Highlander highlander)
         {
-            Console.WriteLine($"Highlander {Id} is fighting Highlander {highlander.Id}");
+            // Ensure both Highlanders are alive
+            if (!this.IsAlive || !highlander.IsAlive) return;
+
+            // Calculate the probability of winning based on power
+            double totalPower = this.Power + highlander.Power;
+            double thisHighlanderChance = this.Power / totalPower;
+
+            // Generate a random number between 0 and 1
+            Random random = new Random();
+            double fightOutcome = random.NextDouble();
+
+            if (fightOutcome < thisHighlanderChance)
+            {
+                // This Highlander wins
+                Console.WriteLine($"Highlander {this.Id} wins against Highlander {highlander.Id}.");
+                this.absorbPower(highlander);
+                highlander.Die();
+            }
+            else
+            {
+                // Opponent wins
+                Console.WriteLine($"Highlander {highlander.Id} wins against Highlander {this.Id}.");
+                highlander.absorbPower(this);
+                this.Die();
+            }
         }
 
 
