@@ -28,10 +28,7 @@ namespace Highlander_ConsoleApp
 
 
             // Create Highlanders
-            List<Highlander> highlanders = new List<Highlander>  {
-                    new GoodHighlander(Id: 1, power: 10, age: 100, position: (0, 0), IsAlive: true),
-                    new BadHighlander(Id: 2, power: 15, age: 150, position: (1, 1), IsAlive: true)
-                };
+            List<Highlander> highlanders = HighlanderFactory.generateRandomHighlanders(highlanderCount, gameBoard.Rows, gameBoard.Columns);
 
             // Initialize the simulation manager
             GameStimulation gamePlay = new GameStimulation(gameBoard, highlanders);

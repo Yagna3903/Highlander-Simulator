@@ -50,7 +50,7 @@
     <Compile Include="GameBoard\IGameBoard.cs" />
     <Compile Include="GameStimulation\GameStart.cs" />
     <Compile Include="GameStimulation\GameStimulation.cs" />
-    <Compile Include="Highlander\Class1.cs" />
+    <Compile Include="Highlander\HighlanderFactory.cs" />
     <Compile Include="Highlander\Highlander.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
