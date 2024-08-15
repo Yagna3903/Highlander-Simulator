@@ -25,8 +25,6 @@ namespace Highlander_ConsoleApp
             // Initialize the game board
             IGameBoard<Highlander> gameBoard = new GameBoard<Highlander>(rows, columns);
 
-
-
             // Create Highlanders
             List<Highlander> highlanders = HighlanderFactory.generateRandomHighlanders(highlanderCount, gameBoard.Rows, gameBoard.Columns);
 

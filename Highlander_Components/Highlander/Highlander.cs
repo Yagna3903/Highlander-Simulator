@@ -106,7 +106,7 @@ namespace Highlander_Components.lander
 
         private bool TryToEscape()
         {
-            return random.Next(0, 2) == 1;
+            return random.Next(2) == 0;
         }
     }
     public class BadHighlander : Highlander
