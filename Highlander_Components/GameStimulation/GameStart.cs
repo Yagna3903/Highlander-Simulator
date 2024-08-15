@@ -11,8 +11,9 @@ namespace Highlander_Components.GameStimulation
         private static List<(int, int)> occupiedPositions = new List<(int, int)>();
         public static void PlaceHighlanders(IGameBoard<Highlander> gameBoard, List<Highlander> highlanders)
         {
-            foreach (var highlander in highlanders)
+            foreach (Highlander highlander in highlanders)
             {
+                // check if the highlander is already placed or not
                 bool placed = false;
 
                 while (!placed)
