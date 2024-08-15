@@ -10,24 +10,37 @@ namespace Highlander_ConsoleApp
     {
         static void Main(string[] args)
         {
-            {
-                // Initialize the game board
-                IGameBoard<Highlander> gameBoard = new GameBoard<Highlander>(5, 5);
 
-                // Create Highlanders
-                List<Highlander> highlanders = new List<Highlander>  {
+            //Declare variables
+            int rows = 5;
+            int columns = 5;
+            int maxIterations = 50;
+            int highlanderCount = 0;
+            int totalCells = rows * columns;
+            Random r = new Random();
+
+            // Randomly generate the number of highlanders
+            highlanderCount = r.Next(totalCells/2, totalCells);
+
+            // Initialize the game board
+            IGameBoard<Highlander> gameBoard = new GameBoard<Highlander>(rows, columns);
+
+
+
+            // Create Highlanders
+            List<Highlander> highlanders = new List<Highlander>  {
                     new GoodHighlander(Id: 1, power: 10, age: 100, position: (0, 0), IsAlive: true),
                     new BadHighlander(Id: 2, power: 15, age: 150, position: (1, 1), IsAlive: true)
                 };
 
-                // Initialize the simulation manager
-                GameStimulation gamePlay = new GameStimulation(gameBoard, highlanders);
+            // Initialize the simulation manager
+            GameStimulation gamePlay = new GameStimulation(gameBoard, highlanders);
 
-                // Run the simulation
-                gamePlay.RunSimulation(50);
+            // Run the simulation
+            gamePlay.RunSimulation(maxIterations);
 
-                Console.ReadLine();
-            }
+            Console.ReadLine();
+
         }
     }
 }
