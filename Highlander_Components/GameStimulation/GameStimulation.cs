@@ -43,13 +43,17 @@ namespace Highlander_Components.GameStimulation
                 }
 
                 // Print all highlanders' positions
-                foreach (Highlander highlander in highlanders)
-                {
-                    if (highlander.IsAlive)
-                    {
-                        highlander.PrintPosition();
-                    }
-                }
+                //foreach (Highlander highlander in highlanders)
+                //{
+                //    if (highlander.IsAlive)
+                //    {
+                //        highlander.PrintPosition();
+                //    }
+                //}
+
+                Console.WriteLine("Before the move");
+                // Print the updated board
+                gameBoard.PrintBoard();
 
                 // Move each highlander
                 foreach (Highlander highlander in highlanders)
@@ -73,6 +77,10 @@ namespace Highlander_Components.GameStimulation
 
                     }
                 }
+                Console.WriteLine("After Move");
+
+                // Print the updated board
+                gameBoard.PrintBoard();
 
                 // loop through the game board and handle interaction between highlanders
 
@@ -103,6 +111,8 @@ namespace Highlander_Components.GameStimulation
                         gameBoard.RemoveItem(highlander, highlander.Position.Item1, highlander.Position.Item2);
                     }
                 }
+
+                Console.WriteLine("After Fight");
 
                 // Print the updated board
                 gameBoard.PrintBoard();
