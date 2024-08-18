@@ -127,7 +127,77 @@ namespace Highlander_Components.GameStimulation
             }
             DisplayResults();
         }
+        public void RunSimulationStep()
+        {
+            // Every 365 iterations, highlanders age by 1 year
+            if (totalIteration % 365 == 0)
+            {
+                foreach (Highlander highlander in highlanders)
+                {
+                    if (highlander.IsAlive) { highlander.age(); }
+                }
+            }
 
+            // Move each highlander
+            foreach (Highlander highlander in highlanders)
+            {
+                if (highlander.IsAlive)
+                {
+                    // Get current position
+                    var (currentRow, currentCol) = highlander.GetPosition();
+
+                    // Move highlander
+                    highlander.Move(gameBoard);
+
+                    // Get new position
+                    var (newRow, newCol) = highlander.GetPosition();
+
+                    // Remove Highlander from old position
+                    gameBoard.RemoveItem(highlander, currentRow, currentCol);
+
+                    // Add Highlander to new position
+                    gameBoard.AddItem(highlander, newRow, newCol);
+                }
+            }
+
+            // Handle interactions between highlanders
+            for (int row = 0; row < gameBoard.Rows; row++)
+            {
+                for (int col = 0; col < gameBoard.Columns; col++)
+                {
+                    if (gameBoard.Board[row, col].Count > 1)
+                    {
+                        // All highlanders at current position
+                        List<Highlander> highlandersAtPosition = gameBoard.Board[row, col];
+
+                        for (int j = 0; j < highlandersAtPosition.Count - 1; j++)
+                        {
+                            for (int k = j + 1; k < highlandersAtPosition.Count; k++)
+                            {
+                                highlandersAtPosition[j].Fight(highlandersAtPosition[k]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Remove dead highlanders from the board
+            foreach (Highlander highlander in highlanders)
+            {
+                if (!highlander.IsAlive)
+                {
+                    gameBoard.RemoveItem(highlander, highlander.Position.Item1, highlander.Position.Item2);
+                }
+            }
+
+            // Check if only one highlander is left
+            if (highlanders.Count(h => h.IsAlive) <= 1)
+            {
+                // Optional: Handle game over condition if needed
+            }
+
+            totalIteration++;
+        }
         private void HandleInteractions(Highlander highlander)
         {
             foreach (Highlander h in highlanders)
