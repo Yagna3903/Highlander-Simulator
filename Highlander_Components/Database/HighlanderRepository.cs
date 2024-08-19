@@ -119,5 +119,151 @@ namespace Highlander_Component.Database
                 }
             }
         }
+
+        // Add: Save game results for Option 1 (One Highlander left)
+        public void SaveGameResultOption1(int winnerId, int totalIterations, List<Victim> victims)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                string insertGameQuery = "INSERT INTO Games (OptionType, WinnerID, TotalIterations) OUTPUT INSERTED.GameID VALUES (1, @WinnerID, @TotalIterations)";
+                int gameId;
+
+                using (SqlCommand cmd = new SqlCommand(insertGameQuery, connection))
+                {
+                    cmd.Parameters.AddWithValue("@WinnerID", winnerId);
+                    cmd.Parameters.AddWithValue("@TotalIterations", totalIterations);
+                    gameId = (int)cmd.ExecuteScalar();
+                }
+
+                string insertVictimQuery = "INSERT INTO Victims (GameID, KillerID, PowerAbsorbed, TimeStep) VALUES (@GameID, @KillerID, @PowerAbsorbed, @TimeStep)";
+
+                foreach (var victim in victims)
+                {
+                    using (SqlCommand cmd = new SqlCommand(insertVictimQuery, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@GameID", gameId);
+                        cmd.Parameters.AddWithValue("@KillerID", winnerId);
+                        cmd.Parameters.AddWithValue("@PowerAbsorbed", victim.PowerAbsorbed);
+                        cmd.Parameters.AddWithValue("@TimeStep", victim.TimeStep);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        // Add: Save game results for Option 2 (Simulation ends after set iterations)
+        public void SaveGameResultOption2(int totalIterations, int goodHighlandersRemaining, int badHighlandersRemaining)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                string insertGameQuery = "INSERT INTO Games (OptionType, TotalIterations, GoodHighlandersRemaining, BadHighlandersRemaining) VALUES (2, @TotalIterations, @GoodRemaining, @BadRemaining)";
+
+                using (SqlCommand cmd = new SqlCommand(insertGameQuery, connection))
+                {
+                    cmd.Parameters.AddWithValue("@TotalIterations", totalIterations);
+                    cmd.Parameters.AddWithValue("@GoodRemaining", goodHighlandersRemaining);
+                    cmd.Parameters.AddWithValue("@BadRemaining", badHighlandersRemaining);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // Add: Retrieve results for Option 1
+        public List<GameResultOption1> GetGameResultsOption1()
+        {
+            List<GameResultOption1> results = new List<GameResultOption1>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                string query = @"
+                    SELECT G.GameID, H.Name AS WinnerName, COUNT(V.VictimID) AS NumberOfVictims, SUM(V.PowerAbsorbed) AS TotalPowerAbsorbed
+                    FROM Games G
+                    JOIN Highlanders H ON G.WinnerID = H.Id
+                    LEFT JOIN Victims V ON V.GameID = G.GameID
+                    WHERE G.OptionType = 1
+                    GROUP BY G.GameID, H.Name";
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        GameResultOption1 result = new GameResultOption1
+                        {
+                            GameID = reader.GetInt32(0),
+                            WinnerName = reader.GetString(1),
+                            NumberOfVictims = reader.GetInt32(2),
+                            TotalPowerAbsorbed = reader.IsDBNull(3) ? 0 : reader.GetInt32(3)
+                        };
+
+                        results.Add(result);
+                    }
+                }
+            }
+
+            return results;
+        }
+
+        // Add: Retrieve results for Option 2
+        public List<GameResultOption2> GetGameResultsOption2()
+        {
+            List<GameResultOption2> results = new List<GameResultOption2>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                string query = @"
+                    SELECT GameID, TotalIterations, GoodHighlandersRemaining, BadHighlandersRemaining
+                    FROM Games
+                    WHERE OptionType = 2";
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        GameResultOption2 result = new GameResultOption2
+                        {
+                            GameID = reader.GetInt32(0),
+                            TotalIterations = reader.GetInt32(1),
+                            GoodHighlandersRemaining = reader.GetInt32(2),
+                            BadHighlandersRemaining = reader.GetInt32(3)
+                        };
+
+                        results.Add(result);
+                    }
+                }
+            }
+
+            return results;
+        }
+    }
+
+    // Add: Helper classes for storing the result objects
+    public class Victim
+    {
+        public int PowerAbsorbed { get; set; }
+        public int TimeStep { get; set; }
+    }
+
+    public class GameResultOption1
+    {
+        public int GameID { get; set; }
+        public string WinnerName { get; set; }
+        public int NumberOfVictims { get; set; }
+        public int TotalPowerAbsorbed { get; set; }
+    }
+
+    public class GameResultOption2
+    {
+        public int GameID { get; set; }
+        public int TotalIterations { get; set; }
+        public int GoodHighlandersRemaining { get; set; }
+        public int BadHighlandersRemaining { get; set; }
     }
 }
