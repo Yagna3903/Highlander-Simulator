@@ -162,7 +162,7 @@ namespace Highlanders
             {
                 if (child is Border border && border.Child is Canvas)
                 {
-                    border.Child = null; // Remove previous Canvas (containing Images)
+                    border.Child = null; // Remove previous Canvas
                 }
             }
 
@@ -187,13 +187,11 @@ namespace Highlanders
                             Height = cellHeight
                         };
 
-                        // Calculate the size of each image relative to the cell size
-                        double imageSize = Math.Min(cellWidth, cellHeight) / Math.Max(1, highlandersAtPosition.Count) * 0.6; // Adjust the multiplier to control image size
+                        // Determine the number of rows and columns for image placement
+                        int imagesPerRow = (int)Math.Ceiling(Math.Sqrt(highlandersAtPosition.Count));
+                        double imageSize = Math.Min(cellWidth, cellHeight) / imagesPerRow * 0.8; // Adjust size based on number of images
 
-                        // Calculate the spacing between images
-                        double spacing = (cellWidth - imageSize) / Math.Max(1, highlandersAtPosition.Count);
-
-                        // Add images to the canvas
+                        // Add images to the canvas in a grid layout
                         for (int i = 0; i < highlandersAtPosition.Count; i++)
                         {
                             Highlander highlander = highlandersAtPosition[i];
@@ -209,9 +207,14 @@ namespace Highlanders
                                         highlander is GoodHighlander ? "pack://application:,,,/Images/good.png" : "pack://application:,,,/Images/bad.png"))
                                 };
 
-                                // Set position of the image within the canvas
-                                Canvas.SetLeft(image, i * spacing + (spacing / 2));
-                                Canvas.SetTop(image, (cellHeight - image.Height) / 2);
+                                // Calculate the position of the image within the canvas grid
+                                int rowInCell = i / imagesPerRow;
+                                int colInCell = i % imagesPerRow;
+                                double xPosition = colInCell * imageSize + (cellWidth - imagesPerRow * imageSize) / 2;
+                                double yPosition = rowInCell * imageSize + (cellHeight - imagesPerRow * imageSize) / 2;
+
+                                Canvas.SetLeft(image, xPosition);
+                                Canvas.SetTop(image, yPosition);
 
                                 canvas.Children.Add(image);
                             }
@@ -228,6 +231,7 @@ namespace Highlanders
                 }
             }
         }
+
 
 
 
