@@ -13,6 +13,8 @@ namespace Highlander_Components.lander
         public (int, int) Position { get; set; }
         public bool IsAlive { get; set; }
 
+        private (int, int) currPos;
+
         protected Random random = new Random();
 
         // Move the highlander to a new position
@@ -27,6 +29,8 @@ namespace Highlander_Components.lander
                 (0, -1),          (0, 1),
                 (1, -1), (1, 0), (1, 1)
             };
+
+            currPos = this.Position;
 
             // Keep trying to move until a valid move is made
             while (!moved)
@@ -43,10 +47,23 @@ namespace Highlander_Components.lander
 
                 if (gameBoard.IsPositionValid(newRow, newCol))
                 {
+                    // Remove Highlander from old position
+                    gameBoard.RemoveItem(this, currPos.Item1, currPos.Item2);
+
+                    // Update the position of the Highlander
                     Position = (newRow, newCol);
+
+                    // Print the new position
                     PrintPosition();
+
+                    // Add Highlander to new position
+                    gameBoard.AddItem(this, newRow, newCol);
+
                     moved = true;
+
                 }
+
+
             }
 
         }
@@ -61,13 +78,22 @@ namespace Highlander_Components.lander
             // Ensure both Highlanders are alive
             if (!this.IsAlive || !highlander.IsAlive) return;
 
-            // Calculate the probability of winning based on power
-            double totalPower = this.Power + highlander.Power;
-            double thisHighlanderChance = this.Power / totalPower;
+
+
+            // Calculate the weighted probability for each Highlander based on power and age
+            double thisHighlanderWeight = (this.Power * 0.6) + (this.Age * 0.4); // 60% weight to power, 40% to age
+            double opponentHighlanderWeight = (highlander.Power * 0.6) + (highlander.Age * 0.4); // Same weighting for opponent
+
+            // Calculate the total weight to determine probabilities
+            double totalWeight = thisHighlanderWeight + opponentHighlanderWeight;
+
+            // Calculate the winning probability for this Highlander
+            double thisHighlanderChance = thisHighlanderWeight / totalWeight;
 
             // Generate a random number between 0 and 1
             Random random = new Random();
             double fightOutcome = random.NextDouble();
+
 
             if (fightOutcome < thisHighlanderChance)
             {
@@ -87,11 +113,11 @@ namespace Highlander_Components.lander
         }
 
 
-            public void PrintPosition()
+        public void PrintPosition()
         {
             Console.WriteLine($"Highlander {Id} is at position {Position}");
         }
-        public abstract void Interact(Highlander highlander);
+        public abstract void Interact(Highlander highlander, int iteration, IGameBoard<Highlander> gb);
 
         // Highlander dies
         public void Die()
@@ -123,19 +149,28 @@ namespace Highlander_Components.lander
             this.IsAlive = IsAlive;
         }
 
-        public override void Interact(Highlander highlander)
+        public override void Interact(Highlander highlander, int iteration, IGameBoard<Highlander> gb)
         {
             if (highlander is BadHighlander)
             {
-                // TODO: Implement logic for interaction between GoodHighlander and BadHighlander
-            }
-        }
+                bool escaped = TryToEscape();
+                if (escaped)
+                {
+                    Move(gb); // Move to a new position
+                    Console.WriteLine($"Highlander {Id} escaped from Highlander {highlander.Id}.");
+                    return;
+                }
+                else
 
-        private bool TryToEscape()
-        {
-            return random.Next(2) == 0;
-            //insertEscap(Highlander1, Highlander2);
-            // highlander escape table -> Iteration ID, good highlander ID, Bad highlander ID.
+                {
+                    Fight(highlander, iteration);
+                }
+            }
+
+            bool TryToEscape()
+            {
+                return random.NextDouble() < 0.65; // 65% chance of escaping
+            }
         }
     }
     public class BadHighlander : Highlander
@@ -149,10 +184,10 @@ namespace Highlander_Components.lander
             this.IsAlive = IsAlive;
         }
 
-        public override void Interact(Highlander highlander)
+        public override void Interact(Highlander highlander, int iteration, IGameBoard<Highlander> gb)
         {
-            // TODO : Implement this method
+            Fight(highlander, iteration);
         }
-
     }
 }
+

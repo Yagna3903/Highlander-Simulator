@@ -1,11 +1,14 @@
 ﻿using Highlander_Component.GameBoard;
 using Highlander_Components.GameStimulation;
 using Highlander_Components.lander;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace Highlanders
@@ -19,7 +22,7 @@ namespace Highlanders
 
         public MainWindow()
         {
-            
+
             InitializeComponent();
             HighlandersSlider.ValueChanged += HighlandersSlider_ValueChanged;
             HighlandersLabel.Text = HighlandersSlider.Value.ToString();
@@ -44,15 +47,20 @@ namespace Highlanders
 
             isSimulationRunning = true;
             InitializeGameBoardGrid(rows, columns);
-            UpdateGrid();
+            UpdateGrid(gameBoard);
         }
 
-        private void NextStep_Click(object sender, RoutedEventArgs e)
+        private async void NextStep_Click(object sender, RoutedEventArgs e)
         {
             if (isSimulationRunning)
             {
                 gamePlay.RunSimulationStep();
-                UpdateGrid();
+                UpdateGrid(gameBoard);
+
+                await Task.Delay(500); // Delay for 500 milliseconds 
+
+                gamePlay.HandleInteractions();
+                UpdateGrid(gameBoard);
 
                 // Check if the simulation has ended
                 var aliveHighlanders = highlanders.Where(h => h.IsAlive).ToList();
@@ -72,19 +80,45 @@ namespace Highlanders
 
         private void RestartSimulation_Click(object sender, RoutedEventArgs e)
         {
-            // Reset the simulation and UI
+            // Reset the simulation state
+            isSimulationRunning = false;
+
+            // Reset UI controls to their initial state
             HighlandersSlider.Value = 5;
             RowsTextBox.Text = "5";
             ColumnsTextBox.Text = "5";
             HighlandersLabel.Text = "5";
+
+            // Clear the GameBoardGrid
             GameBoardGrid.Children.Clear();
             GameBoardGrid.RowDefinitions.Clear();
             GameBoardGrid.ColumnDefinitions.Clear();
-            isSimulationRunning = false;
+
+            // Reinitialize the game board and Highlander list
+            int rows = int.Parse(RowsTextBox.Text);
+            int columns = int.Parse(ColumnsTextBox.Text);
+            gameBoard = new GameBoard<Highlander>(rows, columns);
+            highlanders = HighlanderFactory.generateRandomHighlanders((int)HighlandersSlider.Value, rows, columns);
+
+            // Optionally, re-enable the Start button or other controls if needed
+            StartSimulationButton.IsEnabled = true;
+
+            // Reinitialize the grid on the UI
+            InitializeGameBoardGrid(rows, columns);
+            UpdateGrid(gameBoard);
+
+            // Optionally, clear the Highlander stats list and simulation log
+            HighlanderStatsListBox.Items.Clear();
+            SimulationLogTextBox.Clear();
         }
 
         private void InitializeGameBoardGrid(int rows, int columns)
         {
+            // Clear any existing rows, columns, and children
+            GameBoardGrid.RowDefinitions.Clear();
+            GameBoardGrid.ColumnDefinitions.Clear();
+            GameBoardGrid.Children.Clear();
+
             // Define rows and columns
             for (int i = 0; i < rows; i++)
             {
@@ -108,48 +142,98 @@ namespace Highlanders
                     };
                     Grid.SetRow(border, row);
                     Grid.SetColumn(border, col);
+
+                    // Capture the current row and column values for the lambda expression
+                    int capturedRow = row;
+                    int capturedCol = col;
+
+                    // Show Highlander stats on mouse enter
+                    border.MouseEnter += (s, e) => ShowHighlanderStats(capturedRow, capturedCol);
                     GameBoardGrid.Children.Add(border);
                 }
             }
         }
 
-        private void UpdateGrid()
+
+        private void UpdateGrid(IGameBoard<Highlander> gameBoard)
         {
             // Clear previous Highlander positions
             foreach (UIElement child in GameBoardGrid.Children)
             {
-                if (child is Border border && border.Child is Ellipse)
+                if (child is Border border && border.Child is Canvas)
                 {
-                    border.Child = null; // Remove previous Ellipse
+                    border.Child = null; // Remove previous Canvas
                 }
             }
 
-            // Place Highlanders on the grid
-            foreach (var highlander in highlanders)
+            // Place Highlanders on the grid based on the gameBoard
+            for (int row = 0; row < gameBoard.Rows; row++)
             {
-                if (highlander.IsAlive)
+                for (int col = 0; col < gameBoard.Columns; col++)
                 {
+                    // Get all Highlanders at the current position (row, col)
+                    List<Highlander> highlandersAtPosition = gameBoard.Board[row, col];
 
-                    var (row, col) = highlander.GetPosition(); // Get Highlander position
-
-
-                    Ellipse ellipse = new Ellipse
+                    if (highlandersAtPosition.Count > 0)
                     {
-                        Width = 20, // Adjust size as needed
-                        Height = 20, // Adjust size as needed
-                        Fill = highlander is GoodHighlander ? Brushes.Green : Brushes.Red
-                    };
+                        // Calculate the size of the cell
+                        double cellWidth = GameBoardGrid.ActualWidth / gameBoard.Columns;
+                        double cellHeight = GameBoardGrid.ActualHeight / gameBoard.Rows;
 
-                    // Find the corresponding border in the grid
-                    Border cellBorder = GameBoardGrid.Children
-                        .Cast<UIElement>()
-                        .First(e => Grid.GetRow(e) == row && Grid.GetColumn(e) == col) as Border;
+                        // Create a Canvas to hold multiple Images
+                        Canvas canvas = new Canvas
+                        {
+                            Width = cellWidth,
+                            Height = cellHeight
+                        };
 
-                    // Place the ellipse in the grid cell
-                    cellBorder.Child = ellipse;
+                        // Determine the number of rows and columns for image placement
+                        int imagesPerRow = (int)Math.Ceiling(Math.Sqrt(highlandersAtPosition.Count));
+                        double imageSize = Math.Min(cellWidth, cellHeight) / imagesPerRow * 0.8; // Adjust size based on number of images
+
+                        // Add images to the canvas in a grid layout
+                        for (int i = 0; i < highlandersAtPosition.Count; i++)
+                        {
+                            Highlander highlander = highlandersAtPosition[i];
+
+                            if (highlander.IsAlive)
+                            {
+                                // Create an Image control representing the Highlander
+                                Image image = new Image
+                                {
+                                    Width = imageSize,
+                                    Height = imageSize,
+                                    Source = new BitmapImage(new Uri(
+                                        highlander is GoodHighlander ? "pack://application:,,,/Images/good.png" : "pack://application:,,,/Images/bad.png"))
+                                };
+
+                                // Calculate the position of the image within the canvas grid
+                                int rowInCell = i / imagesPerRow;
+                                int colInCell = i % imagesPerRow;
+                                double xPosition = colInCell * imageSize + (cellWidth - imagesPerRow * imageSize) / 2;
+                                double yPosition = rowInCell * imageSize + (cellHeight - imagesPerRow * imageSize) / 2;
+
+                                Canvas.SetLeft(image, xPosition);
+                                Canvas.SetTop(image, yPosition);
+
+                                canvas.Children.Add(image);
+                            }
+                        }
+
+                        // Find the corresponding border in the grid
+                        Border cellBorder = GameBoardGrid.Children
+                            .Cast<UIElement>()
+                            .First(e => Grid.GetRow(e) == row && Grid.GetColumn(e) == col) as Border;
+
+                        // Place the canvas in the grid cell
+                        cellBorder.Child = canvas;
+                    }
                 }
             }
         }
+
+
+
 
         private void HighlandersSlider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -159,6 +243,39 @@ namespace Highlanders
             // Set the slider's maximum value based on the grid size
             int maxHighlanders = rows * columns; // Maximum number of Highlanders is the total number of grid cells - 1 
             HighlandersSlider.Maximum = maxHighlanders - 1;
+        }
+
+        private void ShowHighlanderStats(int row, int col)
+        {
+            // Debug: Log the row and col values
+            Console.WriteLine($"Row: {row}, Col: {col}, Max Rows: {gameBoard.Rows}, Max Columns: {gameBoard.Columns}");
+
+            // Ensure the row and col are within bounds
+            if (row < 0 || row >= gameBoard.Rows || col < 0 || col >= gameBoard.Columns)
+            {
+                HighlanderStatsListBox.Items.Clear();
+                HighlanderStatsListBox.Items.Add("Invalid position.");
+                return;
+            }
+
+            // Clear the ListBox before showing new stats
+            HighlanderStatsListBox.Items.Clear();
+
+            // Get Highlanders at the specified position
+            List<Highlander> highlandersAtPosition = gameBoard.Board[row, col];
+
+            if (highlandersAtPosition == null || highlandersAtPosition.Count == 0)
+            {
+                HighlanderStatsListBox.Items.Add("No Highlanders at this position.");
+            }
+            else
+            {
+                foreach (Highlander highlander in highlandersAtPosition)
+                {
+                    string stats = $"ID: {highlander.Id}, Power: {highlander.Power}, Age: {highlander.Age}, Alive: {highlander.IsAlive}";
+                    HighlanderStatsListBox.Items.Add(stats);
+                }
+            }
         }
     }
 }
