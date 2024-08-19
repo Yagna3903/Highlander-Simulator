@@ -1,11 +1,8 @@
 ﻿using Highlander_Component.GameBoard;
-using Highlander_Components.Database;
+using Highlander_Components.lander;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Highlander_Component.Database;
-using Highlander_Components.lander;
-using Highlander_Components.Lander;
 
 namespace Highlander_Components.GameStimulation
 {
@@ -14,18 +11,18 @@ namespace Highlander_Components.GameStimulation
         // Declare the game board and highlanders
         private IGameBoard<Highlander> gameBoard;
         private List<Highlander> highlanders;
-        private HighlanderRepository repo;
-        private int totalIteration = 0;
+        int totalIteration = 0;
 
-        public GameStimulation(IGameBoard<Highlander> gameBoard, List<Highlander> highlanders, HighlanderRepository repo)
+
+        public GameStimulation(IGameBoard<Highlander> gameBoard, List<Highlander> highlanders)
         {
             this.gameBoard = gameBoard;
             this.highlanders = highlanders;
-            this.repo = repo;
             GameStart.PlaceHighlanders(this.gameBoard, this.highlanders);
         }
 
-        public void RunSimulationWithCRUD(int maxIterations)
+
+        public void RunSimulation(int maxIterations)
         {
             Console.WriteLine("Game Board at the start:");
             gameBoard.PrintBoard();
@@ -35,19 +32,27 @@ namespace Highlander_Components.GameStimulation
                 Console.WriteLine($"Iteration {i + 1}:");
                 Console.WriteLine("Highlanders' positions:");
 
-                // Handle CRUD operations
-                HandleCRUDOperations();
-
-                // Aging logic
+                // every 365 iterations, highlanders age by 1 year
                 if (i % 365 == 0)
                 {
                     foreach (Highlander highlander in highlanders)
                     {
                         if (highlander.IsAlive) { highlander.age(); }
+
                     }
                 }
 
+                // Print all highlanders' positions
+                //foreach (Highlander highlander in highlanders)
+                //{
+                //    if (highlander.IsAlive)
+                //    {
+                //        highlander.PrintPosition();
+                //    }
+                //}
+
                 Console.WriteLine("Before the move");
+                // Print the updated board
                 gameBoard.PrintBoard();
 
                 // Move each highlander
@@ -55,135 +60,57 @@ namespace Highlander_Components.GameStimulation
                 {
                     if (highlander.IsAlive)
                     {
+                        // Get current position
                         var (currentRow, currentCol) = highlander.GetPosition();
+
+                        // Move highlander
                         highlander.Move(gameBoard);
+
+                        // Get new position
                         var (newRow, newCol) = highlander.GetPosition();
+
+                        // Remove Highlander from old position
                         gameBoard.RemoveItem(highlander, currentRow, currentCol);
+
+                        // Add Highlander to new position
                         gameBoard.AddItem(highlander, newRow, newCol);
+
+                    }
+                }
+                Console.WriteLine("After Move");
+
+                // Print the updated board
+                gameBoard.PrintBoard();
+
+                // loop through the game board and handle interaction between highlanders
+
+                for (int row = 0; row < gameBoard.Rows; row++)
+                {
+                    for (int col = 0; col < gameBoard.Columns; col++)
+                    {
+                        if (gameBoard.Board[row, col].Count > 1)
+                        {
+                            // all highlanders at current position
+                            List<Highlander> highlanders = gameBoard.Board[row, col];
+
+                            for (int j = 0; j < highlanders.Count - 1; j++)
+                            {
+                                for (int k = j + 1; k < highlanders.Count; k++)
+                                {
+                                    highlanders[j].Fight(highlanders[k]);
+                                }
+                            }
+                        }
                     }
                 }
 
-                Console.WriteLine("After Move");
-                gameBoard.PrintBoard();
-
-                // Interaction and combat logic
-                HandleHighlanderInteractions();
-
-                Console.WriteLine("After Fight");
-                gameBoard.PrintBoard();
-
-                // Update the database after each iteration
-                foreach (var highlander in highlanders)
+                foreach (Highlander highlander in highlanders)
                 {
-                    repo.UpdateHighlander(highlander);
+                    if (!highlander.IsAlive)
+                    {
+                        gameBoard.RemoveItem(highlander, highlander.Position.Item1, highlander.Position.Item2);
+                    }
                 }
-
-                // Check if only one highlander is left
-                if (highlanders.Count(h => h.IsAlive) <= 1)
-                {
-                    break;
-                }
-
-                totalIteration++;
-            }
-            DisplayResults();
-        }
-
-        private void HandleCRUDOperations()
-        {
-            Console.WriteLine("Choose an operation: 1-Create, 2-Read, 3-Update, 4-Delete, 5-Continue");
-            string choice = Console.ReadLine();
-
-            switch (choice)
-            {
-                case "1":
-                    CreateHighlander();
-                    break;
-                case "2":
-                    ReadHighlander();
-                    break;
-                case "3":
-                    UpdateHighlander();
-                    break;
-                case "4":
-                    DeleteHighlander();
-                    break;
-                case "5":
-                    // Continue with the simulation
-                    break;
-                default:
-                    Console.WriteLine("Invalid choice, continuing with the simulation.");
-                    break;
-            }
-        }
-
-        private void CreateHighlander()
-        {
-            Console.WriteLine("Creating a new Highlander...");
-            // Assuming we have a method to generate a new Highlander
-            Highlander newHighlander = HighlanderFactory.GenerateSingleHighlander(gameBoard.Rows, gameBoard.Columns);
-            highlanders.Add(newHighlander);
-            gameBoard.AddItem(newHighlander, newHighlander.Position.Item1, newHighlander.Position.Item2);
-            repo.SaveHighlanders(new List<Highlander> { newHighlander });
-            Console.WriteLine("New Highlander created and added to the simulation.");
-        }
-
-        private void ReadHighlander()
-        {
-            Console.WriteLine("Enter the ID of the Highlander to view:");
-            int id = int.Parse(Console.ReadLine());
-            Highlander highlander = highlanders.FirstOrDefault(h => h.Id == id);
-
-            if (highlander != null)
-            {
-                Console.WriteLine($"Highlander ID: {highlander.Id}, Power: {highlander.Power}, Age: {highlander.Age}, Position: ({highlander.Position.Item1}, {highlander.Position.Item2}), Alive: {highlander.IsAlive}");
-            }
-            else
-            {
-                Console.WriteLine("Highlander not found.");
-            }
-        }
-
-        private void UpdateHighlander()
-        {
-            Console.WriteLine("Enter the ID of the Highlander to update:");
-            int id = int.Parse(Console.ReadLine());
-            Highlander highlander = highlanders.FirstOrDefault(h => h.Id == id);
-
-            if (highlander != null)
-            {
-                Console.WriteLine("Enter new power value:");
-                highlander.Power = int.Parse(Console.ReadLine());
-                Console.WriteLine("Enter new age value:");
-                highlander.Age = int.Parse(Console.ReadLine());
-
-                repo.UpdateHighlander(highlander);
-                Console.WriteLine("Highlander updated.");
-            }
-            else
-            {
-                Console.WriteLine("Highlander not found.");
-            }
-        }
-
-        private void DeleteHighlander()
-        {
-            Console.WriteLine("Enter the ID of the Highlander to delete:");
-            int id = int.Parse(Console.ReadLine());
-            Highlander highlander = highlanders.FirstOrDefault(h => h.Id == id);
-
-            if (highlander != null)
-            {
-                highlanders.Remove(highlander);
-                gameBoard.RemoveItem(highlander, highlander.Position.Item1, highlander.Position.Item2);
-                repo.DeleteHighlander(id);
-                Console.WriteLine("Highlander deleted.");
-            }
-            else
-            {
-                Console.WriteLine("Highlander not found.");
-            }
-        }
 
                 Console.WriteLine("After Fight");
 
@@ -275,9 +202,10 @@ namespace Highlander_Components.GameStimulation
         {
             foreach (Highlander h in highlanders)
             {
-                if (!highlander.IsAlive)
+                if (h != highlander && h.Position == highlander.Position)
                 {
-                    gameBoard.RemoveItem(highlander, highlander.Position.Item1, highlander.Position.Item2);
+                    highlander.Interact(h);
+                    //TODO: Implement logic for interaction outcome
                 }
             }
         }
