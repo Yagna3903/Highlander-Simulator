@@ -46,6 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\DatabaseContext.cs" />
+    <Compile Include="Database\HighlanderRepository.cs" />
     <Compile Include="GameBoard\GameBoard.cs" />
     <Compile Include="GameBoard\IGameBoard.cs" />
     <Compile Include="GameStimulation\GameStart.cs" />
