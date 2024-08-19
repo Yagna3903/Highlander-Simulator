@@ -5,29 +5,78 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Highlanders"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Highlanders"  Height="720" Width="1280"
+        ResizeMode="CanResize"
+        MinHeight="600" MinWidth="1024">
     <Grid>
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+            <!-- Title Row -->
+            <RowDefinition Height="*"/>
+            <!-- Content Row (Left Panel, Game Board, Right Panel) -->
         </Grid.RowDefinitions>
 
-        <!-- Input section for rows, columns, and Highlanders -->
-        <Label Content="Rows:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
-        <TextBox x:Name="RowsTextBox" Text="5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="80,10,0,0" Width="50"/>
+        <TextBlock Text="Highlander" 
+           FontSize="32" 
+           HorizontalAlignment="Center" 
+           VerticalAlignment="Center" 
+           Margin="0,10,0,10" 
+           Grid.Row="0"/>
 
-        <Label Content="Columns:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,50,0,0"/>
-        <TextBox x:Name="ColumnsTextBox" Text="5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="80,50,0,0" Width="50"/>
+        
 
-        <Label Content="Highlanders:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,90,0,0"/>
-        <Slider x:Name="HighlandersSlider" Minimum="1" Maximum="100" Value="5" TickFrequency="1" IsSnapToTickEnabled="True" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="110,90,0,0" Width="150"/>
-        <TextBlock x:Name="HighlandersLabel" Text="5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,90,0,0"/>
+        <Grid Grid.Row="1">
 
-        <Button Content="Start Game" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,130,0,0" Width="120" Click="StartSimulation_Click"/>
-        <Button Content="Next" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,130,0,0" Width="80" Click="NextStep_Click"/>
-        <Button Content="Restart" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,130,0,0" Width="80" Click="RestartSimulation_Click"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <!-- Left Panel for Inputs -->
+                <ColumnDefinition Width="*"/>
+                <!-- Center Grid for Game Board -->
+                <ColumnDefinition Width="300"/>
+                <!-- Right Panel for Stats and Log -->
+            </Grid.ColumnDefinitions>
 
-        <!-- Canvas for drawing the game board -->
-        <Canvas x:Name="GameBoardCanvas" Grid.Row="1" Background="LightGray" Margin="10"/>
+            <!-- Left Panel: User Inputs -->
+            <StackPanel Grid.Column="0" Margin="10">
+                <Label Content="Rows:"/>
+                <TextBox x:Name="RowsTextBox" Text="5" Width="200"/>
+
+                <Label Content="Columns:" Margin="0,10,0,0"/>
+                <TextBox x:Name="ColumnsTextBox" Text="5" Width="200"/>
+
+                <Label Content="Number of Highlanders:" Margin="0,10,0,0"/>
+                <Slider x:Name="HighlandersSlider" Minimum="1" Value="5" TickFrequency="1" IsSnapToTickEnabled="True" Width="200" ValueChanged="HighlandersSlider_ValueChanged_1"/>
+                <TextBlock x:Name="HighlandersLabel" Text="5" Margin="0,5,0,0"/>
+
+                <Label Content="End Condition:" Margin="0,10,0,0"/>
+                <ComboBox x:Name="EndConditionComboBox" Width="200">
+                    <ComboBoxItem Content="Only 1 Highlander Left"/>
+                    <ComboBoxItem Content="Set Number of Iterations"/>
+                </ComboBox>
+
+                <!-- Buttons for controlling the simulation -->
+                <Button Content="Start Game" Width="200" Margin="0,20,0,0" Click="StartSimulation_Click"/>
+                <Button Content="Next Step" Width="200" Margin="0,10,0,0" Click="NextStep_Click"/>
+                <Button Content="Restart" Width="200" Margin="0,10,0,0" Click="RestartSimulation_Click"/>
+            </StackPanel>
+
+            <!-- Center Grid: Game Board -->
+            <Grid x:Name="GameBoardGrid" Grid.Column="1" Background="LightGray" Margin="10">
+                <!-- Game board cells will be added here dynamically -->
+            </Grid>
+
+            <!-- Right Panel: Highlander Stats and Simulation Log -->
+            <StackPanel Grid.Column="2" Margin="10">
+                <TextBlock Text="Highlanders Stats" FontWeight="Bold" Margin="0,0,0,10"/>
+                <ListBox x:Name="HighlanderStatsListBox" Height="300">
+                    <!-- Populate this ListBox with Highlander stats -->
+                </ListBox>
+
+                <TextBlock Text="Simulation Log" FontWeight="Bold" Margin="0,10,0,5"/>
+                <TextBox x:Name="SimulationLogTextBox" Height="200" TextWrapping="Wrap" IsReadOnly="True" VerticalScrollBarVisibility="Auto"/>
+            </StackPanel>
+        </Grid>
+
     </Grid>
 </Window>

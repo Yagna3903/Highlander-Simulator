@@ -14,7 +14,7 @@ namespace Highlander_Component.GameBoard
         List<T>[,] Board { get;} 
 
         // Initialize the game board
-        void InitializeBoard(); 
+        void InitializeBoard(int Rows, int Columns); 
 
         // Print the game board
         void PrintBoard(); 

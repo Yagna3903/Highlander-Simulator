@@ -1,13 +1,12 @@
-﻿using Highlander_Components.lander;
-using Highlander_Component.GameBoard;
+﻿using Highlander_Component.GameBoard;
 using Highlander_Components.GameStimulation;
-using System;
+using Highlander_Components.lander;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Highlanders
 {
@@ -20,6 +19,7 @@ namespace Highlanders
 
         public MainWindow()
         {
+            
             InitializeComponent();
             HighlandersSlider.ValueChanged += HighlandersSlider_ValueChanged;
             HighlandersLabel.Text = HighlandersSlider.Value.ToString();
@@ -43,8 +43,8 @@ namespace Highlanders
             gamePlay = new GameStimulation(gameBoard, highlanders);
 
             isSimulationRunning = true;
-            GameBoardCanvas.Children.Clear();
-            UpdateCanvas();
+            InitializeGameBoardGrid(rows, columns);
+            UpdateGrid();
         }
 
         private void NextStep_Click(object sender, RoutedEventArgs e)
@@ -52,22 +52,14 @@ namespace Highlanders
             if (isSimulationRunning)
             {
                 gamePlay.RunSimulationStep();
-                GameBoardCanvas.Children.Clear();
-                UpdateCanvas();
+                UpdateGrid();
 
                 // Check if the simulation has ended
                 var aliveHighlanders = highlanders.Where(h => h.IsAlive).ToList();
                 if (aliveHighlanders.Count == 1)
                 {
                     var lastHighlander = aliveHighlanders.First();
-                    if (lastHighlander is BadHighlander)
-                    {
-                        MessageBox.Show("Game over! Bad Highlander wins.");
-                    }
-                    else if (lastHighlander is GoodHighlander)
-                    {
-                        MessageBox.Show("Game over! Good Highlander wins.");
-                    }
+                    MessageBox.Show(lastHighlander is BadHighlander ? "Game over! Bad Highlander wins." : "Game over! Good Highlander wins.");
                     isSimulationRunning = false;
                 }
                 else if (!highlanders.Any(h => h is BadHighlander && h.IsAlive))
@@ -85,70 +77,88 @@ namespace Highlanders
             RowsTextBox.Text = "5";
             ColumnsTextBox.Text = "5";
             HighlandersLabel.Text = "5";
-            GameBoardCanvas.Children.Clear();
+            GameBoardGrid.Children.Clear();
+            GameBoardGrid.RowDefinitions.Clear();
+            GameBoardGrid.ColumnDefinitions.Clear();
             isSimulationRunning = false;
         }
 
-        private void UpdateCanvas()
+        private void InitializeGameBoardGrid(int rows, int columns)
         {
-            DrawGameBoard(gameBoard.Rows, gameBoard.Columns);
-
-            foreach (var highlander in highlanders)
+            // Define rows and columns
+            for (int i = 0; i < rows; i++)
             {
-                if (highlander.IsAlive)
+                GameBoardGrid.RowDefinitions.Add(new RowDefinition());
+            }
+
+            for (int i = 0; i < columns; i++)
+            {
+                GameBoardGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            }
+
+            // Add borders to each cell
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < columns; col++)
                 {
-                    var (row, col) = highlander.GetPosition();
-                    double cellWidth = GameBoardCanvas.ActualWidth / gameBoard.Columns;
-                    double cellHeight = GameBoardCanvas.ActualHeight / gameBoard.Rows;
-
-                    Ellipse ellipse = new Ellipse
+                    Border border = new Border
                     {
-                        Width = cellWidth * 0.8, // Adjust size as needed
-                        Height = cellHeight * 0.8, // Adjust size as needed
-                        Fill = highlander is GoodHighlander ? Brushes.Green : Brushes.Red
+                        BorderBrush = Brushes.Black,
+                        BorderThickness = new Thickness(1)
                     };
-
-                    Canvas.SetLeft(ellipse, col * cellWidth + (cellWidth - ellipse.Width) / 2);
-                    Canvas.SetTop(ellipse, row * cellHeight + (cellHeight - ellipse.Height) / 2);
-                    GameBoardCanvas.Children.Add(ellipse);
+                    Grid.SetRow(border, row);
+                    Grid.SetColumn(border, col);
+                    GameBoardGrid.Children.Add(border);
                 }
             }
         }
 
-        private void DrawGameBoard(int rows, int columns)
+        private void UpdateGrid()
         {
-            double cellWidth = GameBoardCanvas.ActualWidth / columns;
-            double cellHeight = GameBoardCanvas.ActualHeight / rows;
-
-            // Draw vertical grid lines
-            for (int col = 0; col <= columns; col++)
+            // Clear previous Highlander positions
+            foreach (UIElement child in GameBoardGrid.Children)
             {
-                Line line = new Line
+                if (child is Border border && border.Child is Ellipse)
                 {
-                    X1 = col * cellWidth,
-                    Y1 = 0,
-                    X2 = col * cellWidth,
-                    Y2 = GameBoardCanvas.ActualHeight,
-                    Stroke = Brushes.Black,
-                    StrokeThickness = 1
-                };
-                GameBoardCanvas.Children.Add(line);
+                    border.Child = null; // Remove previous Ellipse
+                }
             }
 
-            // Draw horizontal grid lines
-            for (int row = 0; row <= rows; row++)
+            // Place Highlanders on the grid
+            foreach (var highlander in highlanders)
             {
-                Line line = new Line
+                if (highlander.IsAlive)
                 {
-                    X1 = 0,
-                    Y1 = row * cellHeight,
-                    X2 = GameBoardCanvas.ActualWidth,
-                    Y2 = row * cellHeight,
-                    Stroke = Brushes.Black,
-                    StrokeThickness = 1
-                };
-                GameBoardCanvas.Children.Add(line);
+
+                    var (row, col) = highlander.GetPosition(); // Get Highlander position
+
+
+                    Ellipse ellipse = new Ellipse
+                    {
+                        Width = 20, // Adjust size as needed
+                        Height = 20, // Adjust size as needed
+                        Fill = highlander is GoodHighlander ? Brushes.Green : Brushes.Red
+                    };
+
+                    // Find the corresponding border in the grid
+                    Border cellBorder = GameBoardGrid.Children
+                        .Cast<UIElement>()
+                        .First(e => Grid.GetRow(e) == row && Grid.GetColumn(e) == col) as Border;
+
+                    // Place the ellipse in the grid cell
+                    cellBorder.Child = ellipse;
+                }
             }
+        }
+
+        private void HighlandersSlider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            int rows = int.Parse(RowsTextBox.Text);
+            int columns = int.Parse(ColumnsTextBox.Text);
+
+            // Set the slider's maximum value based on the grid size
+            int maxHighlanders = rows * columns; // Maximum number of Highlanders is the total number of grid cells - 1 
+            HighlandersSlider.Maximum = maxHighlanders - 1;
         }
     }
 }

@@ -7,58 +7,58 @@ namespace Highlander_Component.Database
 {
     public class HighlanderRepository
     {
-        private readonly string _connectionString;
+        private readonly string connectionString;
+        SqlConnection connection;
+        SqlCommand cmd;
 
         public HighlanderRepository(string connectionString)
         {
-            _connectionString = connectionString;
+            this.connectionString = connectionString;
         }
 
         // Fetch all Highlanders from the database
         public List<Highlander> GetAllHighlanders()
         {
             List<Highlander> highlanders = new List<Highlander>();
+            connection = new SqlConnection(connectionString);
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            connection.Open();
+            string query = "SELECT Id, Power, Age, PositionX, PositionY, Type, IsAlive FROM Highlanders";
+            cmd = new SqlCommand(query, connection);
+
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                connection.Open();
-                string query = "SELECT Id, Power, Age, PositionX, PositionY, Type, IsAlive FROM Highlanders";
-                using (SqlCommand cmd = new SqlCommand(query, connection))
+                int id = reader.GetInt32(0);
+                int power = reader.GetInt32(1);
+                int age = reader.GetInt32(2);
+                int posX = reader.GetInt32(3);
+                int posY = reader.GetInt32(4);
+                string type = reader.GetString(5);
+                bool isAlive = reader.GetBoolean(6);
+
+                Highlander highlander;
+
+                if (type == "Good")
                 {
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        int id = reader.GetInt32(0);
-                        int power = reader.GetInt32(1);
-                        int age = reader.GetInt32(2);
-                        int posX = reader.GetInt32(3);
-                        int posY = reader.GetInt32(4);
-                        string type = reader.GetString(5);
-                        bool isAlive = reader.GetBoolean(6);
-
-                        Highlander highlander;
-
-                        if (type == "Good")
-                        {
-                            highlander = new GoodHighlander(id, power, age, (posX, posY), isAlive);
-                        }
-                        else
-                        {
-                            highlander = new BadHighlander(id, power, age, (posX, posY), isAlive);
-                        }
-
-                        highlanders.Add(highlander);
-                    }
+                    highlander = new GoodHighlander(id, power, age, (posX, posY), isAlive);
                 }
+                else
+                {
+                    highlander = new BadHighlander(id, power, age, (posX, posY), isAlive);
+                }
+
+                highlanders.Add(highlander);
+
             }
 
             return highlanders;
         }
 
-        // Save a list of Highlanders to the database
-        public void SaveHighlanders(List<Highlander> highlanders)
+        // Add Highlanders to the database
+        public void AddHighlanders(List<Highlander> highlanders)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
                 foreach (var highlander in highlanders)
@@ -85,7 +85,7 @@ namespace Highlander_Component.Database
         // Update an existing Highlander in the database
         public void UpdateHighlander(Highlander highlander)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
                 string query = "UPDATE Highlanders SET Power = @Power, Age = @Age, PositionX = @PositionX, PositionY = @PositionY, IsAlive = @IsAlive WHERE Id = @Id";
@@ -107,7 +107,7 @@ namespace Highlander_Component.Database
         // Delete a Highlander from the database by Id
         public void DeleteHighlander(int id)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
                 string query = "DELETE FROM Highlanders WHERE Id = @Id";
@@ -123,7 +123,7 @@ namespace Highlander_Component.Database
         // Add: Save game results for Option 1 (One Highlander left)
         public void SaveGameResultOption1(int winnerId, int totalIterations, List<Victim> victims)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
                 string insertGameQuery = "INSERT INTO Games (OptionType, WinnerID, TotalIterations) OUTPUT INSERTED.GameID VALUES (1, @WinnerID, @TotalIterations)";
@@ -156,7 +156,7 @@ namespace Highlander_Component.Database
         // Add: Save game results for Option 2 (Simulation ends after set iterations)
         public void SaveGameResultOption2(int totalIterations, int goodHighlandersRemaining, int badHighlandersRemaining)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
                 string insertGameQuery = "INSERT INTO Games (OptionType, TotalIterations, GoodHighlandersRemaining, BadHighlandersRemaining) VALUES (2, @TotalIterations, @GoodRemaining, @BadRemaining)";
@@ -177,7 +177,7 @@ namespace Highlander_Component.Database
         {
             List<GameResultOption1> results = new List<GameResultOption1>();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
                 string query = @"
@@ -214,7 +214,7 @@ namespace Highlander_Component.Database
         {
             List<GameResultOption2> results = new List<GameResultOption2>();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
                 string query = @"

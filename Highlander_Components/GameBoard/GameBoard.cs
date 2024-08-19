@@ -78,6 +78,9 @@ namespace Highlander_Component.GameBoard
             }
         }
 
-
+        public void InitializeBoard(int Rows, int Columns)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

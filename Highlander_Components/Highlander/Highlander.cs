@@ -1,6 +1,7 @@
 ﻿using Highlander_Component.GameBoard;
 using System;
 using System.ComponentModel;
+using System.Data;
 
 namespace Highlander_Components.lander
 {
@@ -55,7 +56,7 @@ namespace Highlander_Components.lander
             return Position;
         }
 
-        public void Fight(Highlander highlander)
+        public void Fight(Highlander highlander, int iteration)
         {
             // Ensure both Highlanders are alive
             if (!this.IsAlive || !highlander.IsAlive) return;
@@ -74,6 +75,7 @@ namespace Highlander_Components.lander
                 Console.WriteLine($"Highlander {this.Id} wins against Highlander {highlander.Id}.");
                 this.absorbPower(highlander);
                 highlander.Die();
+                //TODO DB.updateKill(iteration, id, hishlander.id)
             }
             else
             {
@@ -132,6 +134,8 @@ namespace Highlander_Components.lander
         private bool TryToEscape()
         {
             return random.Next(2) == 0;
+            //insertEscap(Highlander1, Highlander2);
+            // highlander escape table -> Iteration ID, good highlander ID, Bad highlander ID.
         }
     }
     public class BadHighlander : Highlander

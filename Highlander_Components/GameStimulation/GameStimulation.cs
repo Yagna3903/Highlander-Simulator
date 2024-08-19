@@ -84,7 +84,6 @@ namespace Highlander_Components.GameStimulation
                 gameBoard.PrintBoard();
 
                 // loop through the game board and handle interaction between highlanders
-
                 for (int row = 0; row < gameBoard.Rows; row++)
                 {
                     for (int col = 0; col < gameBoard.Columns; col++)
@@ -93,12 +92,11 @@ namespace Highlander_Components.GameStimulation
                         {
                             // all highlanders at current position
                             List<Highlander> highlanders = gameBoard.Board[row, col];
-
                             for (int j = 0; j < highlanders.Count - 1; j++)
                             {
                                 for (int k = j + 1; k < highlanders.Count; k++)
                                 {
-                                    highlanders[j].Fight(highlanders[k]);
+                                    highlanders[j].Fight(highlanders[k], totalIteration);
                                 }
                             }
                         }
@@ -175,7 +173,8 @@ namespace Highlander_Components.GameStimulation
                         {
                             for (int k = j + 1; k < highlandersAtPosition.Count; k++)
                             {
-                                highlandersAtPosition[j].Fight(highlandersAtPosition[k]);
+                                highlandersAtPosition[j].Fight(highlandersAtPosition[k], totalIteration);
+
                             }
                         }
                     }
@@ -199,6 +198,8 @@ namespace Highlander_Components.GameStimulation
 
             totalIteration++;
         }
+
+        // TODO: Implement logic for Highlander interactions in the future
         private void HandleInteractions(Highlander highlander)
         {
             foreach (Highlander h in highlanders)
