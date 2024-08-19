@@ -38,6 +38,7 @@ namespace Highlander_Components.GameStimulation
                     foreach (Highlander highlander in highlanders)
                     {
                         if (highlander.IsAlive) { highlander.age(); }
+                        // TODO: add database method to update highlander age
 
                     }
                 }
