@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Highlander_Components.lander;
+using System;
 using System.Data.SqlClient;
 
 
@@ -9,8 +10,9 @@ namespace Highlander_Components.Database
         private string connectionString;
 
         public DatabaseContext()
+            //got this reference directly from my database
         {
-            connectionString = "Server=(local);Database=Highlanders;User=UserHighlanders;Password=12345";
+            connectionString = "Data Source =./; Initial Catalog = Highlanders; User ID = UserHighlanders; Password = 12345; Trust Server Certificate = True";
         }
 
         public SqlConnection GetConnection()
