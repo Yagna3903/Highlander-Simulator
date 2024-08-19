@@ -54,9 +54,9 @@
                     <ComboBoxItem Content="Only 1 Highlander Left"/>
                     <ComboBoxItem Content="Set Number of Iterations"/>
                 </ComboBox>
-
+                <Line Margin="0,10,0,0" Fill="Black" Stroke="Black" StrokeThickness="2"></Line>
                 <!-- Buttons for controlling the simulation -->
-                <Button Content="Start Game" Width="200" Margin="0,20,0,0" Click="StartSimulation_Click"/>
+                <Button x:Name="StartSimulationButton" Content="Start Game" Width="200" Margin="0,20,0,0" Click="StartSimulation_Click"/>
                 <Button Content="Next Step" Width="200" Margin="0,10,0,0" Click="NextStep_Click"/>
                 <Button Content="Restart" Width="200" Margin="0,10,0,0" Click="RestartSimulation_Click"/>
             </StackPanel>
