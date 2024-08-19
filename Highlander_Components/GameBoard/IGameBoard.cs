@@ -8,7 +8,7 @@ namespace Highlander_Component.GameBoard
     {
         int Rows { get; } // Number of rows in the game board
         int Columns { get; } // Number of columns in the game board
-
+        int Id { get; set; }
         // <T> is a generic type parameter
         // Game board with List of highlanders at different positions
         List<T>[,] Board { get;} 

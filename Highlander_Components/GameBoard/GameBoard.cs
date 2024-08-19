@@ -6,6 +6,7 @@ namespace Highlander_Component.GameBoard
 {
     public class GameBoard<T> : IGameBoard<T>
     {
+        public int Id {  get; set; }
         public int Rows { get; set; }
         public int Columns { get; set; }
 

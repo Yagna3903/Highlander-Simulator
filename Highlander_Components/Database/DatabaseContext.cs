@@ -1,4 +1,4 @@
-﻿
+﻿using System;
 using System.Data.SqlClient;
 
 
@@ -10,7 +10,7 @@ namespace Highlander_Components.Database
 
         public DatabaseContext()
         {
-            connectionString = "Server=(local);Database=HighlanderDB;User=UserHighlanders;Password=12345";
+            connectionString = "Server=(local);Database=Highlanders;User=UserHighlanders;Password=12345";
         }
 
         public SqlConnection GetConnection()

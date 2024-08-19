@@ -26,6 +26,7 @@ namespace Highlander_Components.GameStimulation
         {
             Console.WriteLine("Game Board at the start:");
             gameBoard.PrintBoard();
+            gameBoard.Id = HighlanderRepository.AddRecord(null, 0,0,0,0);
 
             for (int i = 0; i < maxIterations; i++)
             {
@@ -214,26 +215,41 @@ namespace Highlander_Components.GameStimulation
 
         private void DisplayResults()
         {
+            int killedHighlander = 0;
+            int goodHighlander = 0;
+            int badHighlander = 0;
+            int totalPower = 0;
             int remainingHighlanders = 0;
+            string winner = ""; 
             List<Highlander> remainingH = new List<Highlander>();
             foreach (Highlander h in highlanders)
             {
+                totalPower+= h.Power;
+                if (h is GoodHighlander ) { goodHighlander++; }
+                else { badHighlander++; }
                 if (h.IsAlive)
                 {
                     remainingHighlanders++;
                     remainingH.Add(h);
                 }
+                else
+                {
+                    killedHighlander++;
+                }
             }
-
+            
             Console.WriteLine("Simulation ended.");
             if (remainingHighlanders == 1)
             {
+                winner = remainingH[0] is GoodHighlander ? "good highlander" : "bad highlander";
                 Console.WriteLine($"Winner: {remainingH[0].Id}");
             }
             else
             {
+                winner = "non";
                 Console.WriteLine("Multiple Highlanders survived.");
             }
+            HighlanderRepository.UpdateRecord(gameBoard.Id, winner, killedHighlander, totalPower, goodHighlander, badHighlander);
         }
     }
 }
